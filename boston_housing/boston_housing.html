@@ -13868,8 +13868,8 @@ like the kernel and <strong>C</strong> in the SVM which need to be tuned.</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Answer: </strong>k-fold cross-validation works by dividing the whole data into k buckets and then train our model k times, each time using a different bucket as our testing set and the remaining buckets as our training set, so we eveualte each model on the testing test and then average our result, and the partition of the data better be randomized to get better result.<br>
-Using k-fold cross-validation allow us to tune our hyper-parameters, which can be very useful in grid search because we try all possible hyper-paramets to choose the best one, and if we used the same testing set for all models we will choose model with hyper-parameter that does well on this specific testing set but may not generalize well to other observations, but using k-fold cross-validation we use different testing set each time.</p>
+<p><strong>Answer: </strong>k-fold cross-validation works by dividing the <strong>training</strong> data into k buckets and then train our model k times, each time using a different bucket as our validation set and the remaining buckets as our training set, so we eveualte each model on the validatoin set and then average our result, and then after the k times, we use our seperated <strong>testing data</strong> from the beginning to truly evaluate the model accuracy and make sure it's a good model. (the partition of the data better be randomized to get better result.)<br>
+Using k-fold cross-validation allow us to tune our hyper-parameters, which can be very useful in grid search because we try all possible hyper-paramets to choose the best one, and if we used the same <strong>validation</strong> set for all models we will choose model with hyper-parameter that does well on this specific <strong>validation</strong> set but may not generalize well to other observations, but using k-fold cross-validation we use different <strong>validation</strong> set each time.</p>
 
 </div>
 </div>
