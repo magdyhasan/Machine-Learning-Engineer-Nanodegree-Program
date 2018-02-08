@@ -329,9 +329,9 @@ div#notebook {
 <p><strong>Answer:</strong></p>
 <ul>
 <li>In the agent.py Python file, some flags that can be changed:<ul>
-<li>grid_size: change the size of the grid</li>
-<li>epsilon: change the exploration factor </li>
-<li>enforce_deadline: enforce a deadline metric</li>
+<li>grid_size: change the size of the grid, by making the grid size smaller the agent will learn faster ( i.e less trials ) as he needs to drive less time to reach destionation, on the countary by making the grid_size bigger, we are forcing the agent to learn more and better decisions to be able to reach destination, and this will take more trials.</li>
+<li>epsilon: change the exploration factor, this adjust how much the agent will explore ( i.e make random choice to explore in his state ) versus choosing the action that maxmise his Q-vlaue for this state ( exploitation ), so a bigger epsilon value means our agent will explore  more and exploitate less and vice versus.</li>
+<li>enforce_deadline: enforce a deadline metric, if this set the true the agent will take in consideration whether it reaches the target in the requied time or not, so it plays a big factor in the number of actions agent make before reaching destionation.</li>
 </ul>
 </li>
 <li>The <strong>act</strong> function, which recieve current environment, agent and action and perform the action if it is legal. Receive a reward for the agent based on traffic laws.  </li>
@@ -1541,7 +1541,7 @@ mZlViRMsMzMzMzOzKnGCZWZmZmZmViX/H/lJOhHEoYl3AAAAAElFTkSuQmCC
 <li>'waypoint', is a key feature for the agent, without out the agent would be just driving randomly ( maybe trying o avoid accidents ) till he reach destinations without knowing where he supposed to go.  </li>
 <li>'light', if this feature is not present, agent will just cross red lights, causing accidents, it's indeed an important feature.  </li>
 <li>'left', 'right', 'oncoming' all this 3 features informations are valiable for trying to avoid accidents.</li>
-<li>'deadline' this feature can take wide range of value which make the state very big and the learning very slow, also it doesn't seem that important to agent, it does provide some information but we can learn without it ( as 'waypoint' is somehow related to it )  so it's better not to include it in the state.</li>
+<li>'deadline' this feature can take wide range of value which make the state very big and the learning very slow, also it doesn't seem that important to agent, it does provide some information but we can learn without it ( as 'waypoint' is somehow related to it ), and also might push the agent to make illegal moves,  so it's better not to include it in the state.</li>
 </ul>
 
 </div>
@@ -4828,7 +4828,7 @@ nHPOOedcRjzAcs4555xzzrmMeIDlnHPOOeeccxn5fy/CfrVzyWqOAAAAAElFTkSuQmCC
 <ul>
 <li>I used epsilon = e^(-at), with a = .006.  </li>
 <li>there was about 750 training trials before begining testing.  </li>
-<li>I used tolerance = 0.01, alpha = 0.5. tolernce of 0.01 seems correct for stopping after good number of trials depending on the decaying function. i tried using bigger alpha and smaller but didn't work well for safety, turns out 0.5 is best choice for me, which is kind of comprmise between learning and exploaring.  </li>
+<li>I used tolerance = 0.01, alpha = 0.5. tolernce of 0.01 seems correct for stopping after good number of trials depending on the decaying function. i tried using bigger alpha and smaller but didn't work well for safety, turns out 0.5 is best choice for me, as this value comprimise how much my new learned information will overide the old information.  </li>
 <li>there was a lot of improvement compared to the default Q-Learner, in default Q-Learner best i could get was F in both safety and reliability, i manged to get A+ in safey and A in realability with this Q-Leaner which is a huge improvment.  </li>
 <li>Yeah, now seems the driving agent successfully learned an appropiate policy, it almost got a perfect score.  </li>
 <li>yeah, an A+ on safety and A on reliability seems pretty good to me, i would use this agent.</li>
@@ -4875,9 +4875,51 @@ nHPOOedcRjzAcs4555xzzrmMeIDlnHPOOeeccxn5fy/CfrVzyWqOAAAAAElFTkSuQmCC
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer:</strong></p>
 <ol>
-<li>given what i know about the environment:<ul>
+<li><p>given what i know about the environment:</p>
+<ul>
 <li>on a green light agent follow waypoint if it's ( right ) or ( foward ) or ( left if there is no oncoming traffic making a right turn or coming straight through the intersection. ) or else it should stop</li>
-<li>on a red light agent should stop of follow the waypoint if it's right and no oncoming traffic is approaching from your left through the intersection or else it should stop.</li>
+<li>on a red light agent should stop but should follow the waypoint if it's right and the car on my left ( if any ) is not coming forward through the intersection or else it should stop.  </li>
+<li><p>this snippest of code from environment.py summarize the optimal policy<br>
+# Agent wants to drive forward:
+  if action == 'forward':</p>
+
+<pre><code>  if light != 'green': # Running red light
+      violation = 2 # Major violation
+      if inputs['left'] == 'forward' or inputs['right'] == 'forward': # Cross traffic
+          violation = 4 # Accident
+
+</code></pre>
+<p># Agent wants to drive left:
+  elif action == 'left':</p>
+
+<pre><code>  if light != 'green': # Running a red light
+      violation = 2 # Major violation
+      if inputs['left'] == 'forward' or inputs['right'] == 'forward': # Cross traffic
+          violation = 4 # Accident
+      elif inputs['oncoming'] == 'right': # Oncoming car turning right
+          violation = 4 # Accident
+  else:# Green light
+      if inputs['oncoming'] == 'right' or inputs['oncoming'] == 'forward': # Incoming traffic
+          violation = 3 # Accident
+      else: # Valid move!
+          heading = (heading[1], -heading[0])
+
+</code></pre>
+<p># Agent wants to drive right:
+  elif action == 'right':</p>
+
+<pre><code>  if light != 'green' and inputs['left'] == 'forward': # Cross traffic
+      violation = 3 # Accident
+  else: # Valid move!
+      heading = (-heading[1], heading[0])
+
+</code></pre>
+<p># Agent wants to perform no action:
+  elif action == None:</p>
+
+<pre><code>  if light == 'green': 
+      violation = 1 # Minor violation</code></pre>
+</li>
 </ul>
 </li>
 <li>most of the policies are correct for the given states, however there's some state where polic is different from what i expected.  </li>
