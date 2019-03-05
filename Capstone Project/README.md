@@ -1,6 +1,9 @@
-# Machine Learning Engineer Nanodegree
-## Capstone Project
+# Machine Learning Engineer Nanodegree Capstone Project
+## Gender classification
 
+## [Project report](https://github.com/magdy-hasan/Machine-Learning-Engineer-Nanodegree-Program/blob/master/Capstone%20Project/report.pdf)
+
+## How to use:
 - Download the dataset from [here](https://www.openu.ac.il/home/hassner/Adience/data.html), the "aligned.tar.gz" file
 - untar the file, images will be extracte to aligned folder
 - labels are in txt from fold_0_data.txt to fold_4_data.txt, i mereged all of them into one txt file
